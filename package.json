@@ -1,0 +1,17 @@
+{
+  "name": "aa-biconomy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Scott James",
+  "license": "ISC",
+  "dependencies": {
+    "@biconomy/account": "^4.1.1",
+    "dotenv": "^16.4.5",
+    "ethers": "^6.11.1"
+  },
+  "type": "module"
+}

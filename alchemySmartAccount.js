@@ -3,9 +3,9 @@ import { LocalAccountSigner, polygonMumbai,} from "@alchemy/aa-core";
 
 import { config as dotenvConfig } from 'dotenv';
 import MyToken from "./artifacts/contracts/MyToken.sol/MyToken.json" assert {type :"json"}
-import { encodeAbiParameters,encodeFunctionData } from "viem";
-import { Contract } from "ethers";
+
 dotenvConfig(); // Load environment variables from .env file
+
 const chain = polygonMumbai
 const signer = LocalAccountSigner.privateKeyToAccountSigner(`0x${process.env.PRIVATE_KEY}`);
 
@@ -20,28 +20,20 @@ const client = await createModularAccountAlchemyClient({
   }
 });
 
-export async function mint(transaction){
+export async function sendTransaction(contractAddress, uoCallData) {
     try {
-        console.log("in mint alchemy")
-        const tokenAddress = "0xd9b9Dbe4b351488Cc25b307BF360770e1096F00E"
-
-        const abi = MyToken.abi;
-        
-        const uoCallData = encodeFunctionData({
-            abi,
-            functionName:"mint",
-            args:[transaction.to, 100**18]
-        } )
-
+        // Build UserOperation Object
         const uop = await client.buildUserOperation({
             uo:{
-                target:tokenAddress,
+                target:contractAddress,
                 data:uoCallData,
             }
         })
 
+        // Sign UserOperation Object
         const signedUop = await client.signUserOperation({uoStruct:uop})
-        
+
+        // Send UserOperation Object    
         const {hash} = await client.sendUserOperation({uo:signedUop.callData})  
 
         console.log({hash})
@@ -49,6 +41,8 @@ export async function mint(transaction){
         //Deploy contract
         const txHash = await client.waitForUserOperationTransaction({hash:hash});
         console.log(txHash);
+
+        return txHash
         
     } catch (error) {
         throw error

@@ -2,6 +2,9 @@ import express from 'express';
 import { ethers } from 'ethers';
 import fs from 'fs';
 import { sendSponsoredTransaction } from './biconomySmartAccount.js';
+import { sendTransaction } from './alchemySmartAccount.js'
+import { encodeFunctionData } from "viem";
+
 
 // Read the JSON ABI file
 const jsonFile = fs.readFileSync('./artifacts/contracts/MyToken.sol/MyToken.json');
@@ -90,7 +93,7 @@ app.post('/biconomy/deploy', async (req, res) => {
         console.log("tx:", tx);
 
         // Send transaction using Biconomy
-        //await sendSponsoredTransaction(tx);
+        await sendSponsoredTransaction(tx);
 
         res.status(200).json({ message: 'Contract deployed successfully.' });
     } catch (error) {
@@ -206,7 +209,6 @@ app.post('/biconomy/transfer', async (req, res) => {
     }
 });
 
-  
 
 // Deploy endpoint
 app.post('/eoa/deploy', (req, res) => {
@@ -228,18 +230,76 @@ app.post('/eoa/transfer', (req, res) => {
   // Add logic for transferring tokens
 });
 
-app.post('/mintAlchemy', (req,res)=>{
-  const transaction = {
-    to: req.body.to,
-    value: req.body.value,
-  };
-  mint(transaction)
-    .then(() => {
-      res.status(200).json({ message: 'Transaction sent successfully.' });
+app.post('/alchemy/mint', async(req,res)=> {
+  try {
+    const transaction = {
+      to: req.body.to,
+      value: req.body.value,
+    };
+        console.log("Received request to mint tokens using Alchemy, req body:", req.body);
+    const contractAddress = req.body.contractAddress
+    
+   // const tokenAddress = "0xd9b9Dbe4b351488Cc25b307BF360770e1096F00E"
+          
+    const uoCallData = encodeFunctionData({
+      abi,
+      functionName:"mint",
+      args:[transaction.to, transaction.value]
     })
-    .catch((error) => {
-      res.status(500).json({ error: error.message });
-    });
+
+    const response = await sendTransaction(contractAddress, uoCallData)
+  
+    res.status(200).json({ message: response });
+    
+  } catch (error) {
+      console.log({error})
+  res.status(400).send({ message: error });
+
+  }
+})
+
+app.post('/alchemy/transfer', async(req,res)=> {
+  try {
+    console.log("Received request to transfer tokens using Alchemy, req body:", req.body);
+
+    const { contractAddress, recipient, amount } = req.body;
+          
+    const uoCallData = encodeFunctionData({
+      abi,
+      functionName:"transfer",
+      args:[recipient, amount]
+    })
+
+    const response = await sendTransaction(contractAddress, uoCallData)
+  
+    res.status(200).json({ message: response });
+    
+  } catch (error) {
+    console.log({error})
+    res.status(400).send({ message: error });
+  }
+})
+
+app.post('/alchemy/burn', async(req,res)=> {
+  try {
+    console.log("Received request to burn tokens using Alchemy, req body:", req.body);
+    const contractAddress = req.body.contractAddress
+    const amount = req.body.amount
+          
+    const uoCallData = encodeFunctionData({
+      abi,
+      functionName:"burn",
+      args:[amount]
+    })
+
+    const response = await sendTransaction(contractAddress, uoCallData)
+  
+    res.status(200).json({ message: response });
+    
+  } catch (error) {
+    console.log({error})
+    res.status(400).send({ message: error });
+  }
 })
 // Start the server
 app.listen(PORT, () => {

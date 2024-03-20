@@ -84,13 +84,14 @@ app.post('/biconomy/deploy', async (req, res) => {
 
         // Build the transaction object for deployment
         const tx = {
-            to: "0x0000000000000000000000000000000000000000", // Use zero address for deployment
+            //to: "0x0000000000000000000000000000000000000000", // Use zero address for deployment
+            to: null,
             data: bytecodeWithArgs, // Use the combined bytecode with constructor arguments
         };
         console.log("tx:", tx);
 
         // Send transaction using Biconomy
-        //await sendSponsoredTransaction(tx);
+        await sendSponsoredTransaction(tx);
 
         res.status(200).json({ message: 'Contract deployed successfully.' });
     } catch (error) {
@@ -107,9 +108,12 @@ app.post('/biconomy/mint', async (req, res) => {
         const { contractAddress, to, amount } = req.body;
         const contract = await getContract(contractAddress);
 
+        // Parse the amount string into the number of tokens
+        const parsedAmount = ethers.parseUnits(amount, 18); // Assuming 18 decimal places
+
         // Create the transaction data
         const iface = new ethers.Interface(abi);
-        const transactionData = iface.encodeFunctionData('mint', [to, amount]);
+        const transactionData = iface.encodeFunctionData('mint', [to, parsedAmount]);
 
         if (!transactionData) {
             throw new Error('Failed to encode transaction data.');
@@ -140,11 +144,13 @@ app.post('/biconomy/burn', async (req, res) => {
         console.log("Received request to burn tokens, req body:", req.body);
 
         const { contractAddress, amount } = req.body;
-        const contract = await getContract(contractAddress);
+
+        // Parse the amount string into the number of tokens
+        const parsedAmount = ethers.parseUnits(amount, 18); // Assuming 18 decimal places
 
         // Encode the data for the burn function
         const iface = new ethers.Interface(abi);
-        const transactionData = iface.encodeFunctionData('burn', [amount]);
+        const transactionData = iface.encodeFunctionData('burn', [parsedAmount]);
 
         if (!transactionData) {
             throw new Error('Failed to encode transaction data.');
@@ -154,7 +160,7 @@ app.post('/biconomy/burn', async (req, res) => {
 
         // Build the transaction object
         const tx = {
-            to: contract.address,
+            to: contractAddress,
             data: transactionData,
         };
 
@@ -176,11 +182,13 @@ app.post('/biconomy/transfer', async (req, res) => {
         console.log("Received request to transfer tokens, req body:", req.body);
 
         const { contractAddress, recipient, amount } = req.body;
-        const contract = await getContract(contractAddress);
+
+        // Parse the amount string into the number of tokens
+        const parsedAmount = ethers.parseUnits(amount, 18); // Assuming 18 decimal places
 
         // Encode the data for the transfer function
         const iface = new ethers.Interface(abi);
-        const transactionData = iface.encodeFunctionData('transfer', [recipient, amount]);
+        const transactionData = iface.encodeFunctionData('transfer', [recipient, parsedAmount]);
 
         if (!transactionData) {
             throw new Error('Failed to encode transaction data.');
@@ -190,7 +198,7 @@ app.post('/biconomy/transfer', async (req, res) => {
 
         // Build the transaction object
         const tx = {
-            to: contract.address,
+            to: contractAddress,
             data: transactionData,
         };
 

@@ -22,9 +22,9 @@ POST http://localhost:3000/biconomy/mint
 Content-Type: application/json
 
 {
-  "contractAddress": "0x8d4fa8869a0c198a73ca54af5e10d73a32e92c65",
-  "to": "0x9876543210987654321098765432109876543210",
-  "amount": 1000
+  "contractAddress": "0x3e243D84Ccd9ACA6a34F1C716caC69589D9E69E7",
+  "to": "0xEC12D8BE763a910C05FaE3b39E7575064d3EbcD0",
+  "amount": "1000"
 }
 
 ### Burn Tokens Endpoint
@@ -33,8 +33,8 @@ POST http://localhost:3000/biconomy/burn
 Content-Type: application/json
 
 {
-  "contractAddress": "0x8d4fa8869a0c198a73ca54af5e10d73a32e92c65",
-  "amount": 500
+  "contractAddress": "0x3e243D84Ccd9ACA6a34F1C716caC69589D9E69E7",
+  "amount": "500"
 }
 
 ### Transfer Tokens Endpoint
@@ -43,8 +43,8 @@ POST http://localhost:3000/biconomy/transfer
 Content-Type: application/json
 
 {
-  "contractAddress": "0x8d4fa8869a0c198a73ca54af5e10d73a32e92c65",
-  "to": "0x9876543210987654321098765432109876543210",
-  "amount": 200
+  "contractAddress": "0x3e243D84Ccd9ACA6a34F1C716caC69589D9E69E7",
+  "recipient": "0x513001e9a21b1b9f5a36779195c4cb5175b7f2Fa",
+  "amount": "200"
 }
 

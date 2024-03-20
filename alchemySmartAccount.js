@@ -16,7 +16,7 @@ const client = await createModularAccountAlchemyClient({
   chain,
   signer,
   gasManagerConfig:{
-    policyId:"6f0769c7-fcea-4b79-9de4-45e9991b94d9"
+    policyId:process.env.ALCHEMY_GAS_POLICY
   }
 });
 

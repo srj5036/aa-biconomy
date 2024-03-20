@@ -13,6 +13,8 @@ const config = {
 };
 
 export async function sendSponsoredTransaction(transaction) {
+  console.log("sendSponsoredTransaction, tx:", transaction)
+
   // Generate EOA from private key using ethers.js
   let provider = new ethers.JsonRpcProvider(config.rpcUrl);
   let signer = new ethers.Wallet(config.privateKey, provider);

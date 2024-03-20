@@ -1,4 +1,4 @@
-POST http://localhost:3000/send
+POST http://localhost:3000/biconomy/send
 Content-Type: application/json
 
 {
@@ -6,5 +6,45 @@ Content-Type: application/json
   "value": 100
 }
 
-###
+### Biconomy deploy endpoint
+
+POST http://localhost:3000/biconomy/deploy HTTP/1.1
+Content-Type: application/json
+
+{
+  "defaultAdmin": "0xEC12D8BE763a910C05FaE3b39E7575064d3EbcD0",
+  "minter": "0xEC12D8BE763a910C05FaE3b39E7575064d3EbcD0"
+}
+
+### Mint Tokens Endpoint
+
+POST http://localhost:3000/biconomy/mint
+Content-Type: application/json
+
+{
+  "contractAddress": "0x8d4fa8869a0c198a73ca54af5e10d73a32e92c65",
+  "to": "0x9876543210987654321098765432109876543210",
+  "amount": 1000
+}
+
+### Burn Tokens Endpoint
+
+POST http://localhost:3000/biconomy/burn
+Content-Type: application/json
+
+{
+  "contractAddress": "0x8d4fa8869a0c198a73ca54af5e10d73a32e92c65",
+  "amount": 500
+}
+
+### Transfer Tokens Endpoint
+
+POST http://localhost:3000/biconomy/transfer
+Content-Type: application/json
+
+{
+  "contractAddress": "0x8d4fa8869a0c198a73ca54af5e10d73a32e92c65",
+  "to": "0x9876543210987654321098765432109876543210",
+  "amount": 200
+}
 

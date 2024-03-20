@@ -1,6 +1,6 @@
 import express from 'express';
 import { sendSponsoredTransaction } from './biconomySmartAccount.js';
-
+import {mint} from "./alchemySmartAccount.js"
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -43,6 +43,19 @@ app.post('/transfer', (req, res) => {
   // Add logic for transferring tokens
 });
 
+app.post('/mintAlchemy', (req,res)=>{
+  const transaction = {
+    to: req.body.to,
+    value: req.body.value,
+  };
+  mint(transaction)
+    .then(() => {
+      res.status(200).json({ message: 'Transaction sent successfully.' });
+    })
+    .catch((error) => {
+      res.status(500).json({ error: error.message });
+    });
+})
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

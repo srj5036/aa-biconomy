@@ -9,11 +9,16 @@
   "author": "Scott James",
   "license": "ISC",
   "dependencies": {
+    "@alchemy/aa-accounts": "^3.6.1",
+    "@alchemy/aa-alchemy": "^3.6.1",
+    "@alchemy/aa-core": "^3.6.1",
+    "@alchemy/aa-signers": "^3.6.1",
     "@biconomy/account": "^4.1.1",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@openzeppelin/contracts": "^5.0.2",
     "dotenv": "^16.4.5",
-    "express": "^4.18.3"
+    "express": "^4.18.3",
+    "viem": "^2.8.13"
   },
   "type": "module",
   "devDependencies": {

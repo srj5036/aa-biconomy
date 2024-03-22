@@ -3,6 +3,7 @@ import { LocalAccountSigner, polygonMumbai,} from "@alchemy/aa-core";
 
 import { config as dotenvConfig } from 'dotenv';
 import MyToken from "./artifacts/contracts/MyToken.sol/MyToken.json" assert {type :"json"}
+import { ethers, TransactionReceipt } from "ethers";
 
 dotenvConfig(); // Load environment variables from .env file
 
@@ -20,8 +21,11 @@ const client = await createModularAccountAlchemyClient({
   }
 });
 
+console.log(client.getAddress())
+
 export async function sendTransaction(contractAddress, uoCallData) {
     try {
+
         // Build UserOperation Object
         const uop = await client.buildUserOperation({
             uo:{
@@ -37,60 +41,17 @@ export async function sendTransaction(contractAddress, uoCallData) {
         const {hash} = await client.sendUserOperation({uo:signedUop.callData})  
 
         console.log({hash})
-
+        //const a = await client.waitForUserOperationTransaction()
         //Deploy contract
         const txHash = await client.waitForUserOperationTransaction({hash:hash});
-        console.log(txHash);
-
-        return txHash
+        console.log({txHash});
+        await client.getUserOperationReceipt(hash)
+        const receipt = await client.waitForTransactionReceipt({hash:txHash, confirmations:2});
+        console.log({receipt});
+        //const receipt  = await client.getTransactionReceipt({hash:txHash})       
+         return txHash;
         
     } catch (error) {
         throw error
     }
 }
-
-// (async () => {
-//   // Fund your account address with ETH to send for the user operations
-//   console.log("Smart Account Address: ", client.getAddress()); // Log the smart account address
-//   const param1 = client.getAddress(); // Example parameter
-//   const param2 = client.getAddress(); // Example parameter
-  
-//   const encodedParams = encodeAbiParameters([{
-//     name:"defaultAdmin",
-//     type: "address"
-//   },{
-//      name:"minter",
-//      type: "address"
-//   }],[client.getAddress(),client.getAddress()])
-//   console.log({encodedParams})
-//   const bytecodeWithParams = MyToken.bytecode + encodedParams.substring(2);
-
-//   const elligibility = await client.checkGasSponsorshipEligibility({
-//   target: "0x0000000000000000000000000000000000000000",
-//   data: bytecodeWithParams,
-//   value: 0n, // value in bigint or leave undefined
-// });
-
-// console.log(
-//   `User Operation is ${
-//     elligibility ? "eligible" : "ineligible"
-//   } for gas sponsorship`
-// );
-
-// const uop = await client.buildUserOperation({
-//     uo:{
-//         target:"0x0000000000000000000000000000000000000000",
-//         data:bytecodeWithParams,
-//         value:0n
-//     }
-// })
-
-// const signedUop = await client.signUserOperation({uoStruct:uop})
-//   const {hash} = await client.sendUserOperation({uo:signedUop.callData})  
-
-//   console.log({hash})
-
-//   //Deploy contract
-//   const txHash = await client.waitForUserOperationTransaction({hash:hash});
-//   console.log(txHash);
-// })();

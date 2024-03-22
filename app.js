@@ -8,12 +8,20 @@ import { encodeFunctionData } from "viem";
 
 // Read the JSON ABI file
 const jsonFile = fs.readFileSync('./artifacts/contracts/MyToken.sol/MyToken.json');
+
 const contractData = JSON.parse(jsonFile);
 const abi = contractData.abi;
 const bytecode = contractData.bytecode;
 
+//Deployer Contract
+
+const deployerJson = fs.readFileSync('artifacts/contracts/Deployer.sol/Deployer.json')
+const dContractData =  JSON.parse(deployerJson);
+const dAbi = dContractData.abi;
+const dBytecode = dContractData.bytecode;
+
 // Use the ABI as needed
-console.log("ABI:", abi);
+//console.log("ABI:", abi);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -237,7 +245,38 @@ app.post('/eoa/burn', (req, res) => {
 app.post('/eoa/transfer', (req, res) => {
   // Add logic for transferring tokens
 });
+app.post('/alchemy/deploy', async(req,res)=> {
+  try {
+       const { defaultAdmin, minter, deployerAddress } = req.body;
 
+        const abiCoder = new ethers.AbiCoder();
+        const constructorArgs = abiCoder.encode(['address', 'address'], [defaultAdmin, minter]);
+
+        console.log("constructorArgs:", constructorArgs.slice(2))
+        
+        // Combine bytecode and constructor arguments
+        const tokenContracData = bytecode + constructorArgs.slice(2); // Remove '0x' prefix
+
+        const iface = new ethers.Interface(dAbi);
+        const transactionData = iface.encodeFunctionData('deploy', [tokenContracData]);
+
+        // Combine bytecode and constructor arguments
+        const bytecodeWithArgs = transactionData 
+
+        // Build the transaction object for deployment
+        const tx = {
+            //to: "0x0000000000000000000000000000000000000000", // Use zero address for deployment
+            to: deployerAddress,
+            data: bytecodeWithArgs, // Use the combined bytecode with constructor arguments
+        };
+        console.log("tx:", tx);
+      let response = await sendTransaction(deployerAddress,bytecodeWithArgs )
+
+      res.status(200).send({message:response})
+  } catch (error) {
+      res.status(400).send({message:error})
+  }
+})
 app.post('/alchemy/mint', async(req,res)=> {
   try {
     const transaction = {
